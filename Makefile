@@ -1,8 +1,8 @@
 
 # cross compilation tools
-XTOOLS_DIR = /opt/gcc-arm-none-eabi-4_8-2014q2
+XTOOLS_DIR = /opt/gcc-arm-none-eabi-5_4-2016q2
 X_LIBC_DIR = $(XTOOLS_DIR)/arm-none-eabi/lib/armv7e-m/fpu
-X_LIBGCC_DIR = $(XTOOLS_DIR)/lib/gcc/arm-none-eabi/4.8.3/armv7e-m/fpu
+X_LIBGCC_DIR = $(XTOOLS_DIR)/lib/gcc/arm-none-eabi/5.4.1/armv7e-m/fpu
 X_CC = $(XTOOLS_DIR)/bin/arm-none-eabi-gcc
 X_OBJCOPY = $(XTOOLS_DIR)/bin/arm-none-eabi-objcopy
 X_AR = $(XTOOLS_DIR)/bin/arm-none-eabi-ar
@@ -15,6 +15,7 @@ USB_SERIAL = 0
 
 # grbl sources
 GRBL_DIR = ./grbl/grbl-master
+
 SRC = $(GRBL_DIR)/coolant_control.c \
       $(GRBL_DIR)/delay.c \
       $(GRBL_DIR)/eeprom.c \
@@ -106,15 +107,15 @@ endif
 .c.o:
 	$(X_CC) $(INCLUDE) $(DEFINES) $(CFLAGS) -c $< -o $@
 
+.PHONY: all program grbl_src clean
+
 all: grbl_src $(OBJ)
 	$(X_CC) $(CFLAGS) $(LDFLAGS) $(OBJ) -lm -o $(OUTPUT)
 	$(X_OBJCOPY) -O binary $(OUTPUT) $(OUTPUT).bin
 
-.PHONY: program
 program: 
 	st-flash write $(OUTPUT).bin 0x08000000
 
-.PHONY: grbl_src
 grbl_src:
 	make -C grbl all
 
@@ -124,3 +125,4 @@ clean:
 	-rm $(OUTPUT).map	
 	-rm $(OUTPUT).bin	
 	make -C grbl clean
+
